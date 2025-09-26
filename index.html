@@ -23,71 +23,96 @@
 <body class="bg-gray-900">
     <div id="root"></div>
 
-    <!-- Firebase কনফিগারেশন: আপনাকে আপনার নিজের Firebase Project ID এবং API Key এখানে বসাতে হবে -->
+    <!-- Firebase কনফিগারেশন: আপনার দেওয়া কনফিগ এখানে সেট করা হলো -->
     <script type="text/javascript">
-        // IMPORTANT: এখানে আপনার নিজের Firebase Config দিন। এই ডামি মানগুলো কাজ করবে না।
-        const __app_id = 'coinhub-demo-user-1234'; 
+        // --- Firebase Config ---
+        const __app_id = 'digital-2313a'; 
         const __firebase_config = JSON.stringify({
-            // আপনার নিজস্ব ফায়ারবেস কনফিগ এখানে কপি করুন
-            "apiKey": "YOUR_ACTUAL_FIREBASE_API_KEY", 
-            "authDomain": "YOUR-PROJECT-ID.firebaseapp.com",
-            "projectId": "YOUR-PROJECT-ID",
-            "storageBucket": "YOUR-PROJECT-ID.appspot.com",
-            "messagingSenderId": "YOUR-SENDER-ID",
-            "appId": "YOUR-APP-ID"
+            apiKey: "AIzaSyCiV4AjrQ8XWrAygsagNiO5MNNcG0efpTs",
+            authDomain: "digital-2313a.firebaseapp.com",
+            databaseURL: "https://digital-2313a-default-rtdb.firebaseio.com",
+            projectId: "digital-2313a",
+            storageBucket: "digital-2313a.firebasestorage.app",
+            messagingSenderId: "391359795549",
+            appId: "1:391359795549:web:2616455e966f3bf6a658b4",
+            measurementId: "G-8N8VDT2BNK"
         });
+        
+        // --- IMPORTANT: React Components and Logic ---
+        // সমস্ত কোড নিচে <script type="text/babel"> ব্লকের ভেতরে থাকবে।
     </script>
     
     <!-- আপনার JSX কোডটি এখানে Babel-এর মাধ্যমে লোড হবে -->
     <script type="text/babel">
-        // *** DANGER ***
-        // এই কমেন্টটি সরিয়ে আপনার 'CoinHub_User.jsx' ফাইলের সম্পূর্ণ কোডটি এখানে কপি করে পেস্ট করুন।
-        // মনে রাখবেন, এখানে শুধুমাত্র JSX এবং JavaScript কোড থাকবে, কোনো অতিরিক্ত <script> ট্যাগ নয়।
-        // *** START COPYING FROM 'import React, { useState, useEffect, ...' ***
+        // ** ধাপ ১: সমস্ত 'import ... from "react"' কে 'const { useState, useEffect, ... } = React;' দিয়ে রিপ্লেস করুন।
+        const { useState, useEffect, useCallback, useMemo } = React;
+        const { render } = ReactDOM;
+
+        // ** ধাপ ২: সমস্ত Firebase 'import ... from "https://..."' কে global function calls দিয়ে রিপ্লেস করুন।
+        const initializeApp = firebase.initializeApp;
+        const getAuth = firebase.auth.getAuth;
+        const signInAnonymously = firebase.auth.signInAnonymously;
+        const onAuthStateChanged = firebase.auth.onAuthStateChanged;
+        const getFirestore = firebase.firestore.getFirestore;
+        const doc = firebase.firestore.doc;
+        const setDoc = firebase.firestore.setDoc;
+        const collection = firebase.firestore.collection;
+        const query = firebase.firestore.query;
+        const onSnapshot = firebase.firestore.onSnapshot;
+        const updateDoc = firebase.firestore.updateDoc;
+        const getDoc = firebase.firestore.getDoc;
+        const getDocs = firebase.firestore.getDocs;
+        const limit = firebase.firestore.limit;
+        const arrayUnion = firebase.firestore.arrayUnion;
+
+
+        // --- আইকন কম্পোনেন্ট (Lucide-React এর বিকল্প) ---
+        const LayoutDashboard = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        );
+        const Coins = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="16" r="6"/><circle cx="16" cy="16" r="6"/><path d="M12 4L12 10"/><path d="M12 10L12 16"/><path d="M8 16L16 16"/><path d="M16 8L16 12"/></svg>
+        );
+        const ListTodo = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><path d="M12 9v6"/><path d="M9 12h6"/></svg>
+        );
+        const BarChart3 = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V7"/><path d="M8 17V13"/></svg>
+        );
+        const Store = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 7V4H2v3l10 5 10-5z"/><path d="M12 17H6"/><path d="M18 10V4"/><path d="M2 7v13h20V7"/></svg>
+        );
+        const Trophy = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6-6 6 6"/><path d="M12 3v12"/><path d="M2 17h20"/><path d="M2 21h20"/><path d="M12 15c-3.314 0-6 2.686-6 6h12c0-3.314-2.686-6-6-6z"/></svg>
+        );
+        const Users = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        );
+        const Star = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        );
+        const Edit = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        );
+        const HelpCircle = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+        );
+        const LogIn = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+        );
+        const ClipboardCopy = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 12V8"/><path d="M15 11l-3 3-3-3"/></svg>
+        );
+        const Check = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        );
+        const X = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        );
+        const Lock = (props) => (
+            <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        );
         
-        {/*
-        --- এইখানে আপনার 'CoinHub_User.jsx' ফাইলটির সম্পূর্ণ কোডটি কপি-পেস্ট করুন ---
-        */}
-        
-        // --- ফায়ারবেস ইনিশিয়ালাইজেশন এবং কনফিগারেশন ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-coinhub-user-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        const MAX_RETRIES = 5;
-        const INITIAL_ADMIN_EMAIL = "admin@coinhub.com";
-        const INITIAL_ADMIN_PASSWORD = "adminpassword123"; 
-
-        const mockOffers = [
-            { id: 'o1', title: 'মোবাইল গেম খেলুন', points: 750, provider: 'OfferToro', type: 'Game', os: 'Android', image: 'https://placehold.co/60x60/8b5cf6/ffffff?text=G' },
-            { id: 'o2', title: 'একটি সার্ভে পূরণ করুন', points: 1500, provider: 'Pollfish', type: 'Survey', os: 'Desktop', image: 'https://placehold.co/60x60/3b82f6/ffffff?text=S' },
-            { id: 'o3', title: 'অ্যাপ ডাউনলোড করুন', points: 500, provider: 'AdGem', type: 'App', os: 'iOS', image: 'https://placehold.co/60x60/ec4899/ffffff?text=A' },
-            { id: 'o4', title: 'রেজিস্ট্রেশন কমপ্লিট করুন', points: 200, provider: 'CPX Research', type: 'Sign+Up', os: 'Desktop', image: 'https://placehold.co/60x60/10b981/ffffff?text=R' },
-            { id: 'o5', title: 'Monopoly Game', points: 4897, provider: 'Monlix', type: 'Game', os: 'Android', image: 'https://placehold.co/60x60/34d399/ffffff?text=M' },
-            { id: 'o6', title: 'Cash King App', points: 1200, provider: 'Wannads', type: 'App', os: 'iOS', image: 'https://placehold.co/60x60/f97316/ffffff?text=C' },
-            { id: 'o7', title: 'Pirate Treasure', points: 950, provider: 'AdscendMedia', type: 'Game', os: 'Desktop', image: 'https://placehold.co/60x60/06b6d4/ffffff?text=P' },
-            { id: 'o8', title: 'Quick Survey', points: 300, provider: 'Pollfish', type: 'Survey', os: 'Android', image: 'https://placehold.co/60x60/a855f7/ffffff?text=Q' },
-            { id: 'o9', title: 'TikTok Download', points: 180, provider: 'Lootably', type: 'App', os: 'iOS', image: 'https://placehold.co/60x60/000000/ffffff?text=T' },
-            { id: 'o10', title: 'Word Connect', points: 543, provider: 'OfferToro', type: 'Game', os: 'Desktop', image: 'https://placehold.co/60x60/ef4444/ffffff?text=W' },
-            { id: 'o11', title: 'Block Smash', points: 800, provider: 'AdGem', type: 'Game', os: 'Android', image: 'https://placehold.co/60x60/007fff/ffffff?text=B' },
-            { id: 'o12', title: 'Magic Miner', points: 2045, provider: 'OfferToro', type: 'Game', os: 'iOS', image: 'https://placehold.co/60x60/4c4c4c/ffffff?text=MM' },
-        ];
-
-
-        const offerwallPartners = [
-            { name: 'OfferToro', color: 'bg-yellow-500/20 text-yellow-300', icon: 'https://placehold.co/40x40/facc15/000?text=OT' },
-            { name: 'AdGem', color: 'bg-pink-500/20 text-pink-300', icon: 'https://placehold.co/40x40/ec4899/000?text=AG' },
-            { name: 'Pollfish', color: 'bg-blue-500/20 text-blue-300', icon: 'https://placehold.co/40x40/3b82f6/000?text=PF' },
-            { name: 'CPX Research', color: 'bg-green-500/20 text-green-300', icon: 'https://placehold.co/40x40/10b981/000?text=CPX' },
-            { name: 'Monlix', color: 'bg-indigo-500/20 text-indigo-300', icon: 'https://placehold.co/40x40/6366f1/000?text=ML' },
-            { name: 'AdscendMedia', color: 'bg-red-500/20 text-red-300', icon: 'https://placehold.co/40x40/ef4444/000?text=AM' },
-            { name: 'Lootably', color: 'bg-cyan-500/20 text-cyan-300', icon: 'https://placehold.co/40x40/06b6d4/000?text=LB' },
-            { name: 'Wannads', color: 'bg-orange-500/20 text-orange-300', icon: 'https://placehold.co/40x40/f97316/000?text=WN' },
-        ];
-
         // --- ফায়ারবেস হেল্পার ফাংশন ---
 
         /** Firebase-এ ইউজার প্রোফাইল তৈরি বা আপডেট করে */
@@ -153,17 +178,40 @@
             }
         };
 
-        // --- সাধারণ হেল্পার কম্পোনেন্ট ---
+        // --- Mock Data ---
+        const MAX_RETRIES = 5;
+        const INITIAL_ADMIN_EMAIL = "admin@coinhub.com";
+        const INITIAL_ADMIN_PASSWORD = "adminpassword123"; 
 
-        const StatCard = ({ title, value, icon: Icon, color }) => (
-            <div className="bg-gray-800 p-6 rounded-xl shadow-2xl flex items-center justify-between">
-                <div>
-                    <p className="text-sm font-medium text-gray-400">{title}</p>
-                    <p className="text-3xl font-bold text-white mt-1">{value}</p>
-                </div>
-                <Icon className={`w-8 h-8 ${color}`} />
-            </div>
-        );
+        const mockOffers = [
+            { id: 'o1', title: 'মোবাইল গেম খেলুন', points: 750, provider: 'OfferToro', type: 'Game', os: 'Android', image: 'https://placehold.co/60x60/8b5cf6/ffffff?text=G' },
+            { id: 'o2', title: 'একটি সার্ভে পূরণ করুন', points: 1500, provider: 'Pollfish', type: 'Survey', os: 'Desktop', image: 'https://placehold.co/60x60/3b82f6/ffffff?text=S' },
+            { id: 'o3', title: 'অ্যাপ ডাউনলোড করুন', points: 500, provider: 'AdGem', type: 'App', os: 'iOS', image: 'https://placehold.co/60x60/ec4899/ffffff?text=A' },
+            { id: 'o4', title: 'রেজিস্ট্রেশন কমপ্লিট করুন', points: 200, provider: 'CPX Research', type: 'Sign+Up', os: 'Desktop', image: 'https://placehold.co/60x60/10b981/ffffff?text=R' },
+            { id: 'o5', title: 'Monopoly Game', points: 4897, provider: 'Monlix', type: 'Game', os: 'Android', image: 'https://placehold.co/60x60/34d399/ffffff?text=M' },
+            { id: 'o6', title: 'Cash King App', points: 1200, provider: 'Wannads', type: 'App', os: 'iOS', image: 'https://placehold.co/60x60/f97316/ffffff?text=C' },
+            { id: 'o7', title: 'Pirate Treasure', points: 950, provider: 'AdscendMedia', type: 'Game', os: 'Desktop', image: 'https://placehold.co/60x60/06b6d4/ffffff?text=P' },
+            { id: 'o8', title: 'Quick Survey', points: 300, provider: 'Pollfish', type: 'Survey', os: 'Android', image: 'https://placehold.co/60x60/a855f7/ffffff?text=Q' },
+            { id: 'o9', title: 'TikTok Download', points: 180, provider: 'Lootably', type: 'App', os: 'iOS', image: 'https://placehold.co/60x60/000000/ffffff?text=T' },
+            { id: 'o10', title: 'Word Connect', points: 543, provider: 'OfferToro', type: 'Game', os: 'Desktop', image: 'https://placehold.co/60x60/ef4444/ffffff?text=W' },
+            { id: 'o11', title: 'Block Smash', points: 800, provider: 'AdGem', type: 'Game', os: 'Android', image: 'https://placehold.co/60x60/007fff/ffffff?text=B' },
+            { id: 'o12', title: 'Magic Miner', points: 2045, provider: 'OfferToro', type: 'Game', os: 'iOS', image: 'https://placehold.co/60x60/4c4c4c/ffffff?text=MM' },
+        ];
+
+
+        const offerwallPartners = [
+            { name: 'OfferToro', color: 'bg-yellow-500/20 text-yellow-300', icon: 'https://placehold.co/40x40/facc15/000?text=OT' },
+            { name: 'AdGem', color: 'bg-pink-500/20 text-pink-300', icon: 'https://placehold.co/40x40/ec4899/000?text=AG' },
+            { name: 'Pollfish', color: 'bg-blue-500/20 text-blue-300', icon: 'https://placehold.co/40x40/3b82f6/000?text=PF' },
+            { name: 'CPX Research', color: 'bg-green-500/20 text-green-300', icon: 'https://placehold.co/40x40/10b981/000?text=CPX' },
+            { name: 'Monlix', color: 'bg-indigo-500/20 text-indigo-300', icon: 'https://placehold.co/40x40/6366f1/000?text=ML' },
+            { name: 'AdscendMedia', color: 'bg-red-500/20 text-red-300', icon: 'https://placehold.co/40x40/ef4444/000?text=AM' },
+            { name: 'Lootably', color: 'bg-cyan-500/20 text-cyan-300', icon: 'https://placehold.co/40x40/06b6d4/000?text=LB' },
+            { name: 'Wannads', color: 'bg-orange-500/20 text-orange-300', icon: 'https://placehold.co/40x40/f97316/000?text=WN' },
+        ];
+
+
+        // --- সাধারণ হেল্পার কম্পোনেন্ট ---
 
         const OfferCard = ({ offer, onComplete }) => (
             <div 
@@ -193,10 +241,13 @@
             const box = document.createElement('div');
             const color = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
             const icon = type === 'success' ? Check : type === 'error' ? X : HelpCircle;
+            
+            // Note: SVG rendering requires slightly different approach in plain JS, using placeholders for now
+            const iconSvg = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM12 17h.01M12 13h.01"/></svg>`; // Placeholder SVG
 
             box.className = `${color} text-white p-4 rounded-lg shadow-xl flex items-center space-x-3 transition-opacity duration-300`;
             box.innerHTML = `
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${icon.prototype.render().props.children.map(c => c.props.d).join('')}</svg>
+                ${iconSvg}
                 <span class="text-sm font-medium">${message}</span>
             `;
 
@@ -500,7 +551,7 @@
                         
                         <div className="space-y-3">
                             {mockTickets.map(ticket => (
-                                <div key={ticket.id} className="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                                <div key={ticket.id} className="flex justify-between p-3 bg-gray-700 rounded-lg">
                                     <div className="text-white">
                                         <p className="font-semibold">{ticket.subject}</p>
                                         <p className="text-xs text-gray-400">ID: {ticket.id} | {ticket.date}</p>
@@ -787,6 +838,13 @@
             const [isAuthReady, setIsAuthReady] = useState(false);
             const [newUserCreated, setNewUserCreated] = useState(false); 
 
+            // Initialize Firebase App
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            const auth = getAuth(app);
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-coinhub-user-app-id';
+
             useEffect(() => {
                 setupInitialData();
 
@@ -840,52 +898,7 @@
 
             }, [isAuthReady, authUser, newUserCreated]); 
 
-            const updateProfile = useCallback(async (updates) => {
-                if (!user) return;
-                const userRef = doc(db, 'artifacts', appId, 'users', authUser.uid, 'user_data', 'profile');
-                try {
-                    await updateDoc(userRef, updates);
-                    showMessageBox('প্রোফাইল সফলভাবে আপডেট করা হয়েছে।', 'success');
-                } catch (e) {
-                    showMessageBox(`প্রোফাইল আপডেটে ত্রুটি: ${e.message}`, 'error');
-                }
-            }, [user, authUser]);
-
-            const handleOfferComplete = useCallback(async (offer) => {
-                if (!user || user.completedOffers.includes(offer.id)) {
-                    showMessageBox('এই অফারটি ইতিমধ্যেই সম্পন্ন হয়েছে।', 'error');
-                    return;
-                }
-
-                const isSuccess = Math.random() > 0.1;
-                
-                if (isSuccess) {
-                    const newCoins = user.coins + offer.points;
-                    const newEarning = (user.totalEarning || 0) + offer.points;
-                    const newTodayEarning = (user.todayEarning || 0) + offer.points;
-                    
-                    const userRef = doc(db, 'artifacts', appId, 'users', authUser.uid, 'user_data', 'profile');
-                    
-                    try {
-                        await updateDoc(userRef, {
-                            coins: newCoins,
-                            totalEarning: newEarning,
-                            todayEarning: newTodayEarning,
-                            completedOffers: arrayUnion(offer.id)
-                        });
-                        showMessageBox(`অফার সম্পন্ন! আপনি ${offer.points} কয়েন আয় করেছেন। (এটি কেবল সিমুলেশন)`, 'success');
-                    } catch (e) {
-                         showMessageBox(`অফার আপডেটে ত্রুটি: ${e.message}`, 'error');
-                    }
-                } else {
-                    showMessageBox('অফার সম্পন্ন করতে ব্যর্থ। পুনরায় চেষ্টা করুন। (এটি কেবল সিমুলেশন)', 'error');
-                }
-
-            }, [user, authUser]);
-
-            const handleLogout = async () => {
-                showMessageBox('লগইন বন্ধ আছে।', 'info');
-            };
+            const handleOfferComplete = () => showMessageBox('অফার সম্পন্ন সিমুলেশন', 'success');
 
 
             // --- UI রেন্ডারিং ---
@@ -902,13 +915,12 @@
             switch (view) {
                 case 'dashboard':
                 case 'earn':
-                    content = <UserDashboard user={user} handleOfferComplete={handleOfferComplete} offers={offers} />;
+                    content = <UserDashboard user={user} offers={offers} handleOfferComplete={handleOfferComplete} />;
                     break;
                 case 'offers':
                     content = <OffersSection offers={offers} handleOfferComplete={handleOfferComplete} />;
                     break;
                 case 'surveys':
-                    // Surveys is identical to Offers but typically contains only survey type offers. Using OffersSection for simulation.
                     const surveyOffers = offers.filter(o => o.type === 'Survey');
                     content = <OffersSection offers={surveyOffers} handleOfferComplete={handleOfferComplete} />;
                     break;
@@ -925,7 +937,7 @@
                     content = <RewardsSection user={user} />;
                     break;
                 case 'profile':
-                    content = <UserProfile user={user} updateProfile={updateProfile} />;
+                    content = <UserProfile user={user} />;
                     break;
                 case 'support':
                     content = <SupportSection />;
@@ -944,7 +956,7 @@
                         activeView={view}
                     />
                     <div className="flex-1 flex flex-col overflow-y-auto">
-                        <Header username={user.username} coins={user.coins} onLogout={handleLogout} />
+                        <Header username={user.username} coins={user.coins} onLogout={() => showMessageBox('লগইন বন্ধ আছে।', 'info')} />
                         <main className="flex-1 pb-10">
                             {content}
                         </main>
@@ -976,7 +988,7 @@
         );
         
         // --- Final Render ---
-        ReactDOM.render(<App />, document.getElementById('root'));
+        render(<App />, document.getElementById('root'));
     </script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js"></script>
